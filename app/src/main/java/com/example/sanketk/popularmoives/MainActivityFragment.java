@@ -2,6 +2,8 @@ package com.example.sanketk.popularmoives;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -29,13 +31,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment implements MoviesAdapter.OnItemClickListener {
     private static final String TAG = MainActivityFragment.class.getSimpleName();
     private int listType = R.string.most_popular;
     private Dialog mDialog;
     private MoviesAdapter moviesArrayAdapter;
     private List<ResultsItem> resultsItemList;
     RecyclerView rvMoivesList;
+    int numColumns=2;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
@@ -168,8 +171,33 @@ public class MainActivityFragment extends Fragment {
         if (this.resultsItemList == null) {
             this.resultsItemList = new ArrayList();
         }
-        this.rvMoivesList.setLayoutManager(new GridLayoutManager(getActivity(), 2));
-        this.moviesArrayAdapter = new MoviesAdapter(getActivity(), this.resultsItemList);
+        this.rvMoivesList.setLayoutManager(new GridLayoutManager(getActivity(), numColumns));
+        this.moviesArrayAdapter = new MoviesAdapter(getActivity(), this.resultsItemList, this);
         this.rvMoivesList.setAdapter(this.moviesArrayAdapter);
+    }
+
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+
+        numColumns=(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE ? 3 : 2);
+        Log.d(TAG,"onConfigurationChanged numColumns "+numColumns);
+        super.onConfigurationChanged(newConfig);
+        initialiseRecyclerView();
+    }
+
+    @Override
+    public void onItemClick(ResultsItem resultsItem) {
+        Intent intent = new Intent(getActivity(), MoiveDetailsActivity.class);
+        intent.putExtra("resultsItem", resultsItem);
+//        Bundle bundle= new Bundle();
+//        bundle.putInt("id", resultsItem.getId());
+//        bundle.putString("OriginalTitle", resultsItem.getOriginalTitle());
+//        bundle.putString("Overview", resultsItem.getOverview());
+//        bundle.putString("VoteAverage", BuildConfig.FLAVOR + resultsItem.getVoteAverage());
+//        bundle.putString("ReleaseDate", resultsItem.getReleaseDate());
+//        bundle.putString("PosterPath", resultsItem.getPosterPath());
+//        intent.putExtras(bundle);
+        startActivity(intent);
     }
 }

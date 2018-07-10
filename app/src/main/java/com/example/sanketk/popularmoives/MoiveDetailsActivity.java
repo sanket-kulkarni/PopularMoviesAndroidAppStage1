@@ -3,6 +3,7 @@ package com.example.sanketk.popularmoives;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,16 +24,18 @@ public class MoiveDetailsActivity extends AppCompatActivity {
         this.tvMoiveTitle = (TextView) findViewById(R.id.tvMoiveTitle);
         this.ivMoviePoster = (ImageView) findViewById(R.id.ivMoviePoster);
         this.tvOverview = (TextView) findViewById(R.id.tvOverview);
+        this.tvOverview.setMovementMethod(new ScrollingMovementMethod());
         this.tvVoteAverage = (TextView) findViewById(R.id.tvVoteAverage);
         this.tvReleaseDate = (TextView) findViewById(R.id.tvReleaseDate);
-        if(getIntent().getExtras()!=null) {
-            Bundle bundle=getIntent().getExtras();
-            Log.d(TAG,"onBindViewHolder pos "+getIntent().getIntExtra("pos",0));
-            String strOriginalTitle=bundle.getString("OriginalTitle");
-            String strOverview=bundle.getString("Overview");
-            String strReleaseDate=bundle.getString("ReleaseDate");
-            String strVoterAvg=bundle.getString("VoteAverage")+ "/10";
-            String strPosterPath=bundle.getString("PosterPath");
+        if(getIntent().getParcelableExtra("resultsItem")!=null) {
+            ResultsItem resultsItem=getIntent().getParcelableExtra("resultsItem");
+            //Bundle bundle=getIntent().getExtras();
+            Log.d(TAG,"onBindViewHolder resultsItem "+resultsItem);
+            String strOriginalTitle=resultsItem.getOriginalTitle();
+            String strOverview=resultsItem.getOverview();
+            String strReleaseDate=resultsItem.getReleaseDate();
+            String strVoterAvg=resultsItem.getVoteAverage()+ "/10";
+            String strPosterPath=resultsItem.getPosterPath();
             this.tvMoiveTitle.setText(strOriginalTitle);
             this.tvOverview.setText(strOverview);
             this.tvVoteAverage.setText(strVoterAvg);

@@ -19,6 +19,7 @@ public class MoviesAdapter extends Adapter<MoviesAdapter.ListHolder> {
     private static final String TAG = MoviesAdapter.class.getSimpleName();
     Context context;
     List<ResultsItem> resultsItemList;
+    private final OnItemClickListener listener;
 
     public class ListHolder extends ViewHolder {
         ImageView ivMoivePoster;
@@ -27,11 +28,19 @@ public class MoviesAdapter extends Adapter<MoviesAdapter.ListHolder> {
             super(itemView);
             this.ivMoivePoster = (ImageView) itemView.findViewById(R.id.movie_image);
         }
+        public void bind(final ResultsItem item, final OnItemClickListener listener) {
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) {
+                    listener.onItemClick(item);
+                }
+            });
+        }
     }
 
-    public MoviesAdapter(Context context, List<ResultsItem> resultsItemList) {
+    public MoviesAdapter(Context context, List<ResultsItem> resultsItemList, OnItemClickListener listener) {
         this.context = context;
         this.resultsItemList = resultsItemList;
+        this.listener = listener;
         notifyDataSetChanged();
     }
 
@@ -41,29 +50,14 @@ public class MoviesAdapter extends Adapter<MoviesAdapter.ListHolder> {
 
     public void onBindViewHolder(ListHolder holder, int position) {
         final ResultsItem resultsItem = (ResultsItem) this.resultsItemList.get(position);
-
+        holder.bind(resultsItem, listener);
         Log.d(TAG,"onBindViewHolder position "+position);
         Log.d(TAG,"onBindViewHolder resultsItem "+resultsItem);
 
         if (!TextUtils.isEmpty(resultsItem.getPosterPath())) {
             Glide.with(this.context).load("http://image.tmdb.org/t/p/w185/" + resultsItem.getPosterPath()).into(holder.ivMoivePoster);
         }
-        final int pos=position;
-        holder.ivMoivePoster.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(MoviesAdapter.this.context, MoiveDetailsActivity.class);
-                Bundle bundle= new Bundle();
-                bundle.putInt("id", resultsItem.getId());
-                bundle.putInt("pos", pos);
-                bundle.putString("OriginalTitle", resultsItem.getOriginalTitle());
-                bundle.putString("Overview", resultsItem.getOverview());
-                bundle.putString("VoteAverage", BuildConfig.FLAVOR + resultsItem.getVoteAverage());
-                bundle.putString("ReleaseDate", resultsItem.getReleaseDate());
-                bundle.putString("PosterPath", resultsItem.getPosterPath());
-                intent.putExtras(bundle);
-                MoviesAdapter.this.context.startActivity(intent);
-            }
-        });
+
     }
 
     public int getItemCount() {
@@ -71,5 +65,9 @@ public class MoviesAdapter extends Adapter<MoviesAdapter.ListHolder> {
             return this.resultsItemList.size();
         }
         return 0;
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(ResultsItem item);
     }
 }
